@@ -1,0 +1,25 @@
+---
+- hosts: web_servers
+  become: true
+  vars:
+    github_repo_url: "https://github.com/yourusername/yourwebpage.git"
+  roles:
+    - webserver
+    - git
+    - nodejs
+    - yourwebpage
+
+  tasks:
+    - name: Clone GitHub repo
+      git:
+        repo: "{{ github_repo_url }}"
+        dest: /var/www/html
+
+    - name: Install Node.js dependencies
+      npm:
+        path: /var/www/html
+
+    - name: Restart web server
+      service:
+        name: apache2
+        state: restarted
