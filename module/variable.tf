@@ -53,5 +53,5 @@ variable "dynamodb_table_name" {
 variable "kubernetes_version" {
   description = "The version of Kubernetes to use for the EKS cluster."
   type        = string
-  default     = "1.20"
+  default     = "1.24"
 }

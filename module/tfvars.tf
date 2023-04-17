@@ -7,4 +7,4 @@ eks_worker_instance_type = "t3.medium"
 eks_worker_desired_capacity = 3
 s3_bucket_name       = "my-terraform-state-bucket"
 dynamodb_table_name  = "my-terraform-state-locking-table"
-kubernetes_version   = "1.20"
+kubernetes_version   = "1.24"

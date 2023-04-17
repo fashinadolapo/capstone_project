@@ -8,20 +8,35 @@ module "vpc" {
   public_subnet_cidrs  = var.public_subnet_cidrs
 }
 
-module "eks_cluster" {
-  source = "./modules/eks_cluster"
+# Create EKS cluster
+module "eks" {
+  source = "./modules/eks"
 
-  cluster_name           = var.eks_cluster_name
-  kubernetes_version     = var.kubernetes_version
-  vpc_id                 = module.vpc.vpc_id
-  private_subnet_ids     = module.vpc.private_subnet_ids
-  public_subnet_ids      = module.vpc.public_subnet_ids
+  cluster_name              = var.cluster_name
+  subnets                   = var.public_subnets
+  vpc_id                    = var.vpc_id
+  create_eks_service_role   = true
+  kubernetes_version        = var.kubernetes_version
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
 }
 
+# Create worker nodes
 module "eks_workers" {
-  source = "./modules/eks_workers"
+  source = "./modules/eks"
 
-  cluster_name              = var.eks_cluster_name
-  instance_type             = var.eks_worker_instance_type
-  desired_capacity          = var.eks_worker_desired_capacity
-  additional_security_group_ids =
+  cluster_name              = var.cluster_name
+  subnets                   = var.public_subnets
+  instance_type             = var.instance_type
+  desired_capacity          = var.desired_capacity
+  create_worker_security_group = true
+  additional_security_group_ids = [module.vpc.vpc_default_security_group_id]
+  additional_security_group_names = ["eks-workers-sg"]
+  kubelet_extra_args = "--node-labels=env=dev"
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
+}
