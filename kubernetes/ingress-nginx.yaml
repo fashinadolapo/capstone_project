@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: my-web-app-ingress
+  name: dolapo-web-app-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-  - host: my-web-app.example.com
+  - host: dolapo-web-app.example.com
     http:
       paths:
-      - path: /my-web-app
+      - path: /dolapo-web-app
         pathType: Prefix
         backend:
           service:
-            name: my-web-app-service
+            name: dolapo-web-app-service
             port:
               name: http

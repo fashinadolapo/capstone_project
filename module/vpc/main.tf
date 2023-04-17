@@ -84,14 +84,14 @@ resource "aws_route_table_association" "private" {
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = aws_vpc.example.id
 
   ingress {
     description = "TLS from VPC"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    cidr_blocks = [aws_vpc.example.cidr_block]
   }
 
   egress {
@@ -112,5 +112,5 @@ resource "aws_security_group_rule" "example" {
   to_port           = 65535
   protocol          = "tcp"
   cidr_blocks       = [aws_vpc.example.cidr_block]
-  security_group_id = "aws_security_group."
+  security_group_id = aws_security_group.allow_tls.id
 }

@@ -1,25 +1,24 @@
 pipeline {
   agent any
-  
+
   environment {
-    APP_NAME = 'my-app'
-    DOCKER_IMAGE = 'my-docker-registry/my-app'
+    APP_NAME = 'dolapo-app'
+    DOCKER_IMAGE = 'my-docker-registry/dolapo-app'
     DOCKER_REGISTRY_CREDENTIALS_ID = 'docker-registry-credentials'
-    TEST_ENVIRONMENT_URL = 'http://test.example.com'
-    PROD_ENVIRONMENT_URL = 'http://prod.example.com'
+    TEST_ENVIRONMENT_URL = 'http://jenkins_server_ip_address'
     KUBE_CONFIG_CREDENTIALS_ID = 'kube-config-credentials'
-    KUBE_NAMESPACE = 'my-namespace'
-    KUBE_DEPLOYMENT_NAME = 'my-app-deployment'
-    KUBE_SERVICE_NAME = 'my-app-service'
+    KUBE_NAMESPACE = 'fash'
+    KUBE_DEPLOYMENT_NAME = 'dolapo-app-deployment'
+    KUBE_SERVICE_NAME = 'dolapo-app-service'
   }
-  
+
   stages {
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/my-org/my-app.git'
+        git branch: 'main', url: 'https://github.com/dolapofashina/shopping-cart-application.git'
       }
     }
-    
+
     stage('Build') {
       steps {
         sh 'npm install'
@@ -27,16 +26,16 @@ pipeline {
         sh 'docker build -t $DOCKER_IMAGE:$BUILD_NUMBER .'
       }
     }
-    
+
     stage('Test') {
       environment {
         NODE_ENV = 'test'
       }
-      
+
       steps {
         sh 'docker run --rm -p 3000:3000 $DOCKER_IMAGE:$BUILD_NUMBER npm test'
       }
-      
+
       post {
         always {
           junit 'reports/**/*.xml'
@@ -44,7 +43,7 @@ pipeline {
         }
       }
     }
-    
+
     stage('Push to Registry') {
       steps {
         withCredentials([usernamePassword(credentialsId: DOCKER_REGISTRY_CREDENTIALS_ID, passwordVariable: 'DOCKER_REGISTRY_PASSWORD', usernameVariable: 'DOCKER_REGISTRY_USERNAME')]) {
@@ -53,18 +52,18 @@ pipeline {
         sh "docker push $DOCKER_IMAGE:$BUILD_NUMBER"
       }
     }
-    
+
     stage('Deploy to Test Environment') {
       environment {
         KUBECONFIG = credentials('kube-config-credentials')
       }
-      
+
       steps {
         sh "kubectl set image deployment/$KUBE_DEPLOYMENT_NAME $KUBE_DEPLOYMENT_NAME=$DOCKER_IMAGE:$BUILD_NUMBER -n $KUBE_NAMESPACE"
         sh "kubectl rollout status deployment/$KUBE_DEPLOYMENT_NAME -n $KUBE_NAMESPACE"
         sh "kubectl apply -f k8s/test.yaml -n $KUBE_NAMESPACE"
       }
-      
+
       post {
         always {
           script {
@@ -76,23 +75,23 @@ pipeline {
         }
       }
     }
-    
+
     stage('Deploy to Production Environment') {
       environment {
         KUBECONFIG = credentials('kube-config-credentials')
       }
-      
+
       input {
         message "Are you sure you want to deploy to production?"
         ok "Yes"
       }
-      
+
       steps {
         sh "kubectl set image deployment/$KUBE_DEPLOYMENT_NAME $KUBE_DEPLOYMENT_NAME=$DOCKER_IMAGE:$BUILD_NUMBER -n $KUBE_NAMESPACE"
         sh "kubectl rollout status deployment/$KUBE_DEPLOYMENT_NAME -n $KUBE_NAMESPACE"
         sh "kubectl apply -f k8s/prod.yaml -n $KUBE_NAMESPACE"
       }
-      
+
       post {
         always {
           script {

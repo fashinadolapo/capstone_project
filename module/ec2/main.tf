@@ -10,3 +10,4 @@ resource "aws_instance" "example" {
     Name = var.instance_names[count.index]
   }
 }
+

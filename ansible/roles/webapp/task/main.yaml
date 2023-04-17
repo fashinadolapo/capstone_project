@@ -1,0 +1,29 @@
+- name: install nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: install git
+  apt:
+    name: git
+    state: present
+
+- name: Clone GitHub repo
+  git:
+    repo: "{{ github_repo_url }}"
+    dest: /var/www/html
+    version: main
+    clone: yes
+
+- name: copy nginx configuration
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+  notify: restart nginx
+
+- name: Enable nginx site
+  file:
+    src: /etc/nginx/sites-available/default
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  notify: restart nginx

@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-web-app
+  name: dolapo-web-app
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: my-web-app
+      app: dolapo-web-app
   template:
     metadata:
       labels:
-        app: my-web-app
+        app: dolapo-web-app
     spec:
       containers:
-      - name: my-web-app
-        image: my-web-app:latest
+      - name: dolapo-web-app
+        image: dolapo-web-app:latest
         ports:
         - containerPort: 8080
         resources:
@@ -28,10 +28,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-web-app-service
+  name: dolapo-web-app-service
 spec:
   selector:
-    app: my-web-app
+    app: dolapo-web-app
   ports:
   - protocol: TCP
     port: 80

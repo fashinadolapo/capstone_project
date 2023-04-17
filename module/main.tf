@@ -1,4 +1,4 @@
-
+# Create VPC
 module "vpc" {
   source = "./modules/vpc"
 
@@ -6,6 +6,27 @@ module "vpc" {
   vpc_cidr             = var.vpc_cidr
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
+}
+
+# Create ec_2 instance
+module "ec2_instance" {
+  source  = "./modules/ec2"
+  
+  for_each = toset(["one", "two", "three","four", "five"])
+
+  name = "instance-${each.key}"
+
+  ami                    = "ami-005e54dee72cc1d00"
+  instance_type          = "t2.micro"
+  key_name               = "user1"
+  monitoring             = true
+  vpc_security_group_ids = ["aws_security_group.allow_tls.id"]
+  subnet_id              = aws_subnet.public[count.index].id
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
 }
 
 # Create EKS cluster
@@ -39,4 +60,37 @@ module "eks_workers" {
     Terraform   = "true"
     Environment = "dev"
   }
+}
+
+# Create s3 bucket
+module "s3_bucket" {
+  source = "./modules/s3$db"
+
+  bucket = var.bucket_name
+  acl    = "private"
+
+  versioning =  {
+    enabled  = true
+  }
+}
+
+# Create dynamodb-table
+module "dynamodb_table" {
+  source = "./modules/s3$db"
+
+  name     = var.my-table
+  hash_key = "id"
+
+  attribute =  [
+    {
+      name  = "id"
+      type  = "N"
+    }
+ ]
+
+ tags = {
+   Terraform   = "true"
+   Environment = "dev"
+ }
+
 }
