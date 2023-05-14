@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-web-app
+  template:
+    metadata:
+      labels:
+        app: my-web-app
+    spec:
+      containers:
+      - name: my-web-app
+        image: my-web-app:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 2
+            memory: 512Mi
+          requests:
+            cpu: 1
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-web-app-service
+spec:
+  selector:
+    app: my-web-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer
+  loadBalancerIP: <YOUR_LOAD_BALANCER_IP>

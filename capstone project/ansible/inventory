@@ -1,0 +1,9 @@
+web_servers:
+  hosts:
+    webserver1:
+      ansible_host: ec2_instance_1.id
+    webserver2:
+      ansible_host: ec2_instance_2.id
+
+  vars:
+    ansible_user: yourusername

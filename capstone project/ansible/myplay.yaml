@@ -1,0 +1,36 @@
+---
+- hosts: web_servers
+  become: true
+  vars:
+    github_repo_url: "https://github.com/dolapofashina/musical-concert-page-main"
+  roles:
+    - webserver
+    - git
+    - nodejs
+    - yourwebpage
+
+  tasks:
+    - name: Clone GitHub repo
+      git:
+        repo: "{{ github_repo_url }}"
+        dest: /var/www/html
+
+    - name: Install Node.js dependencies
+      npm:
+        path: /var/www/html
+
+    - name: Restart web server
+      service:
+        name: nginx
+        state: restarted
+- name: Set up Nginx webserver
+  host: web_servers
+  become: true
+  roles:
+    - nginx
+
+- name: Set up webserver
+  host: web_servers
+  become: true
+  roles:
+    - webapp
