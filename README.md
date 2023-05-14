@@ -30,7 +30,7 @@ Step 6: Use Terraform to deploy the Kubernetes Clusters and the Ingress Controll
 •	Deploy the application to the Kubernetes Clusters using Kubernetes YAML files
 •	Use the Kubernetes plugin for Jenkins to interact with the Kubernetes Clusters
 •	Use environment variables in the Jenkins pipeline to store sensitive data such as AWS access keys and Docker Hub credentials
-•	Add the necessary Kubernetes YAML files to the project directory, such as a deployment YAML file and a service YAML file, to deploy the application to the Kubernetes Clusters
+•	Add the necessary Kubernetes YAML files to the project directory, such as a deployment YAML file and a service YAML file, to    deploy the application to the Kubernetes Clusters
 •	Use kubectl commands in the Jenkins pipeline to apply the Kubernetes YAML files to the Kubernetes Clusters
 
 Step 7: Setup an Nginx Ingress Controller for the services deployed in the K8s Cluster
